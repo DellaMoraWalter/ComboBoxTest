@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="ComboBoxTest.MainPage"
+             
+             xmlns:sf="clr-namespace:Syncfusion.XForms.ComboBox;assembly=Syncfusion.SfComboBox.XForms"
+             xmlns:local="clr-namespace:ComboBoxTest"
+             
+             x:Name="ctrl"
+             >
+
+    
+    <ContentPage.Resources>
+        <local:ValuesToDsc_Conv x:Key="ValuesToDsc_Conv"/>
+        <local:EnumToList_Conv x:Key="EnumToList_Conv"/>
+    </ContentPage.Resources>
+
+    
+    <StackLayout>
+
+        <Label
+            TextColor="Red"
+            Text="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Converter={StaticResource ValuesToDsc_Conv}}"
+            />
+
+        <sf:SfComboBox
+            WidthRequest="300" HorizontalOptions="Start"
+            DataSource="{Binding Converter={StaticResource EnumToList_Conv}, ConverterParameter={x:Type local:Values}}"
+            SelectedItem="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Mode=TwoWay}"
+            IsEditableMode="False"
+            >
+
+            <sf:SfComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label 
+                        Margin="10,0,0,0" 
+                        Text="{Binding Path=., Converter={StaticResource ValuesToDsc_Conv}}"
+                        />
+                </DataTemplate>
+            </sf:SfComboBox.ItemTemplate>
+        </sf:SfComboBox>
+
+
+
+    </StackLayout>
+
+</ContentPage>
