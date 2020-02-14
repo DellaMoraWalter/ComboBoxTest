@@ -51,6 +51,11 @@ namespace ComboBoxTest
         {
             if (value != null)
             {
+                if (value is string strValue)
+                {
+                    value = Enum.Parse(typeof(Values), strValue);
+                }
+
                 switch ((Values)value)
                 {
                     case Values.value1: return AppResources.Value1Dsc;
