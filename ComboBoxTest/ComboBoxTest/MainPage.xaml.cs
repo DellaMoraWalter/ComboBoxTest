@@ -17,12 +17,21 @@ namespace ComboBoxTest
         public static readonly BindableProperty selectedEnumValueProperty = BindableProperty.Create(
             nameof(selectedEnumValue),
             typeof(Values),
-            typeof(MainPage));
+            typeof(MainPage),
+            Values.value1,
+            propertyChanged: selectedEnumValueChanged);
 
         public Values selectedEnumValue
         {
             get => (Values)GetValue(selectedEnumValueProperty);
             set => SetValue(selectedEnumValueProperty, value);
+        }
+        static void selectedEnumValueChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (newValue != null)
+            {
+                var self = bindable as MainPage;
+            }
         }
         #endregion
 
@@ -45,24 +54,52 @@ namespace ComboBoxTest
 
 
 
-    public class ValuesToDsc_Conv : Xamarin.Forms.IValueConverter
+    public class EnumItem<T>
     {
+        public T value { get; set; }
+        public string dsc { get; set; }
+
+        public EnumItem(T value, string dsc)
+        {
+            this.value = value;
+            this.dsc = dsc;
+        }
+    }
+
+
+
+    public class EnumItemsCollection<T> : Xamarin.Forms.IValueConverter
+    {
+        private IList<EnumItem<T>> _values = null;
+        public IList<EnumItem<T>> values
+        {
+            get
+            {
+                if (_values == null)
+                    _values = GetValues();
+
+                return _values;
+            }
+        }
+
+        protected virtual IList<EnumItem<T>> GetValues()
+        {
+            throw new NotImplementedException();
+        }
+
+        public EnumItem<T> GetEnumItemFromValue(T value)
+        {
+            return values.FirstOrDefault(p => EqualityComparer<T>.Default.Equals(p.value, value));
+        }
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value != null)
             {
-                if (value is string strValue)
-                {
-                    value = Enum.Parse(typeof(Values), strValue);
-                }
-
-                switch ((Values)value)
-                {
-                    case Values.value1: return AppResources.Value1Dsc;
-                    case Values.value2: return AppResources.Value2Dsc;
-                    case Values.value3: return AppResources.Value3Dsc;
-                    default: return null; //throw new ArgumentOutOfRangeException();
-                }
+                if (parameter == null)
+                    return GetEnumItemFromValue((T)value);
+                else if ((string)parameter == "description")
+                    return GetEnumItemFromValue((T)value).dsc;
             }
 
             return null;
@@ -70,33 +107,27 @@ namespace ComboBoxTest
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (value != null)
+            {
+                return ((EnumItem<T>)value).value;
+            }
+
             return null;
         }
     }
 
 
 
-    public class EnumToList_Conv : Xamarin.Forms.IValueConverter
+    public class ValuesItems : EnumItemsCollection<Values>
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        protected override IList<EnumItem<Values>> GetValues()
         {
-            if (parameter == null)
-                return null;
-            else
+            return new List<EnumItem<Values>>()
             {
-                var array = Enum.GetValues(parameter as Type);
-
-                List<object> list = new List<object>();
-                foreach (object obj in array)
-                    list.Add(obj);
-
-                return list;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return null;
+                new EnumItem<Values>(Values.value1, AppResources.Value1Dsc),
+                new EnumItem<Values>(Values.value2, AppResources.Value2Dsc),
+                new EnumItem<Values>(Values.value3, AppResources.Value3Dsc)
+            };
         }
     }
 }

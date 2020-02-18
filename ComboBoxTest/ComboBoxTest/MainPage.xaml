@@ -14,8 +14,7 @@
 
     
     <ContentPage.Resources>
-        <local:ValuesToDsc_Conv x:Key="ValuesToDsc_Conv"/>
-        <local:EnumToList_Conv x:Key="EnumToList_Conv"/>
+        <local:ValuesItems x:Key="ValuesItems"/>
     </ContentPage.Resources>
 
     
@@ -23,31 +22,17 @@
 
         <Label
             TextColor="Red"
-            Text="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Converter={StaticResource ValuesToDsc_Conv}}"
+            Text="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Converter={StaticResource ValuesItems}, ConverterParameter=description}"
             />
 
+
         <sf:SfComboBox
-            x:Name="ctrlComboBox"
             WidthRequest="300" HorizontalOptions="Start"
-            DataSource="{Binding Converter={StaticResource EnumToList_Conv}, ConverterParameter={x:Type local:Values}}"
-            SelectedItem="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Mode=TwoWay}"
+            DataSource="{Binding Source={StaticResource ValuesItems}, Path=values}"
+            DisplayMemberPath="dsc"
+            SelectedItem="{Binding Source={x:Reference ctrl}, Path=selectedEnumValue, Mode=TwoWay, Converter={StaticResource ValuesItems}}"
             IsEditableMode="False"
-            >
-
-            <sf:SfComboBox.CustomView>
-                <Label Text="{Binding Source={x:Reference ctrlComboBox}, Path=SelectedItem, Converter={StaticResource ValuesToDsc_Conv}}"/>
-            </sf:SfComboBox.CustomView>
-
-            <sf:SfComboBox.ItemTemplate>
-                <DataTemplate>
-                    <Label 
-                        Margin="10,0,0,0" 
-                        Text="{Binding Path=., Converter={StaticResource ValuesToDsc_Conv}}"
-                        />
-                </DataTemplate>
-            </sf:SfComboBox.ItemTemplate>
-        </sf:SfComboBox>
-
+            />
 
 
     </StackLayout>
